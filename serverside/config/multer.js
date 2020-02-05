@@ -16,7 +16,8 @@ const fileFilter = (req, file, cb) => {
   if (
     file.mimetype === "audio/mpeg" ||
     file.mimetype === "audio/wave" ||
-    file.mimetype === "audio/wav"
+    file.mimetype === "audio/wav" ||
+     file.mimetype === "audio/mp3"
   ) {
     cb(null, true);
   } else {
