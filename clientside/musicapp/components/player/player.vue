@@ -6,13 +6,18 @@
           <h3 class="text-center">Player</h3>
         </div>
       </div>
+      <!-- <div class="row" v-if="song">
+        <div class="col-md-12">
+          <div class="alert alert-primary">Please Add a song</div>
+        </div>
+      </div>-->
       <div class="row mt-5">
         <div class="col-md-6">
           <img
             src="https://images.pexels.com/photos/3624281/pexels-photo-3624281.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
             class="image"
           />
-          <div class="card player_card">
+          <div class="card player_card" v-if="current">
             <div class="card-body">
               <h6 class="card-title">
                 <b>{{this.current.title}} - {{this.current.artist}}</b>
@@ -58,10 +63,12 @@
 export default {
   data() {
     return {
+      // current: null,
       current: {
         title: '',
         artist: ''
       },
+      song: true,
       isplaying: false,
       allMusic: null,
       index: 0,
@@ -70,8 +77,12 @@ export default {
   },
   methods: {
     async initPlayer() {
-      this.current = await this.allMusic[this.index]
-      this.player.src = `http://localhost:4000/${this.current.music.path}`
+      if (this.allMusic !== []) {
+        this.current = await this.allMusic[this.index]
+        this.player.src = `http://localhost:4000/${this.current.music.path}`
+      } else {
+        this.song = true
+      }
     },
     play(song) {
       console.log(song)
@@ -107,10 +118,17 @@ export default {
     async getAllSongs() {
       try {
         let response = await this.$axios.$get('/music')
-        this.allMusic = response
+        console.log(response)
+        if (response === []) {
+          this.song = true
+          this.current = null
+        } else {
+          this.song = false
+          this.allMusic = response
+        }
         await this.initPlayer()
-        console.log(this.allMusic)
       } catch (err) {
+        this.current = null
         console.log(err)
       }
     }
@@ -119,7 +137,6 @@ export default {
     if (process.client) {
       this.player = new Audio()
     }
-
     this.getAllSongs()
   }
 }
